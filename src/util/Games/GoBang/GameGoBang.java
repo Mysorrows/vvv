@@ -19,6 +19,7 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
     private int chessBoard[][];
     private int nowPlayer;
     private JSONObject record;
+    private int stepNum;
 
     public GameGoBang(int row,int col){
         this.row = row;
@@ -35,6 +36,7 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
         record.put("row",row);
         record.put("col",col);
         record.put("step",new JSONArray());
+        stepNum = 0;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
         aStep.put("x",i);
         aStep.put("y",j);
         record.getJSONArray("step").add(aStep);
-
+        stepNum++;
         if(i<0||i>=row||j<0||j>col||chessBoard[i][j] != 0){
             if(nowPlayer == 1){
                 return 4;
@@ -104,7 +106,10 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
             }
             if(nowLength>=5) return player;
         }
-        return -1;
+        if(stepNum == row*col){
+            return -1;
+        }
+        return 0;
     }
 
     public JSONObject getRecord(){

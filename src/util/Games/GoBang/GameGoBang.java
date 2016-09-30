@@ -2,6 +2,7 @@ package util.Games.GoBang;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import util.Games.BaseGame;
 import util.JSON.JSON;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
  * 黑子先下
  * Created by syimlzhu on 2016/9/30.
  */
-public class GameGoBang {
+public class GameGoBang extends BaseGame<GameGoBangStep>{
     private int row;
     private int col;
     private int chessBoard[][];
@@ -36,6 +37,11 @@ public class GameGoBang {
         record.put("step",new JSONArray());
     }
 
+    @Override
+    public int setStep(GameGoBangStep step) {
+        return set(step.x,step.y);
+    }
+
     /**
      * 在位置i,j下一枚子
      * 返回胜利方
@@ -55,18 +61,11 @@ public class GameGoBang {
         aStep.put("y",j);
         record.getJSONArray("step").add(aStep);
 
-        if(i<0||i>=row||j<0||j>col){
-            if(nowPlayer == 0){
-                return 3;
+        if(i<0||i>=row||j<0||j>col||chessBoard[i][j] != 0){
+            if(nowPlayer == 1){
+                return 4;
             }else{
-                return 2;
-            }
-        }
-        if(chessBoard[i][j] != 0){
-            if(nowPlayer == 0){
                 return 3;
-            }else{
-                return 2;
             }
         }
         chessBoard[i][j] = nowPlayer;
@@ -111,4 +110,5 @@ public class GameGoBang {
     public JSONObject getRecord(){
         return record;
     }
+
 }

@@ -3,25 +3,26 @@ package util.Games.GoBang;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import util.Games.BaseGame;
-import util.JSON.JSON;
-
-import java.util.ArrayList;
-import java.util.List;
+import util.Games.GameReadException;
+import util.Games.IGamePlayer;
 
 /**
  * 1表示黑子，2表示白子
  * 黑子先下
  * Created by syimlzhu on 2016/9/30.
  */
-public class GameGoBang extends BaseGame<GameGoBangStep>{
+public class GameGoBang extends BaseGame{
     private int row;
     private int col;
     private int chessBoard[][];
+    /**
+     * 当前落子方  用1、2表示
+     */
     private int nowPlayer;
     private JSONObject record;
     private int stepNum;
 
-    public GameGoBang(int row,int col){
+    public GameGoBang(int row,int col,IGamePlayer p1,IGamePlayer p2){
         this.row = row;
         this.col = col;
         chessBoard = new int[row][];
@@ -37,11 +38,43 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
         record.put("col",col);
         record.put("step",new JSONArray());
         stepNum = 0;
+        nowPlayer = 1;
+        players.add(p1);
+        players.add(p2);
     }
 
     @Override
-    public int setStep(GameGoBangStep step) {
-        return set(step.x,step.y);
+    public int run() {
+        try {
+            players.get(0).putInt(1);
+            players.get(1).putInt(2);
+        }catch (GameReadException e) {
+            return -1;
+        }
+        while(true){
+            int x,y,otherPlayer;
+            try {
+                x = players.get(nowPlayer - 1).getInt();
+                y = players.get(nowPlayer - 1).getInt();
+                otherPlayer = 3 - nowPlayer;
+            }catch (GameReadException e){
+                return nowPlayer + 2;
+            }
+            int ret = set(x, y);
+            if(ret == 3 || ret == 4) {
+                //落子非法
+                return ret;
+            }
+
+            try {
+                players.get(otherPlayer -1).putInt(x);
+                players.get(otherPlayer -1).putInt(y);
+            } catch (GameReadException e) {
+                return otherPlayer + 2;
+            }
+            if(ret != 0) return ret;
+            nowPlayer = 3 - nowPlayer;
+        }
     }
 
     /**
@@ -57,7 +90,7 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
      *         4黑方下子非法，白方胜
      *         -1平局
      */
-    public int set(int i,int j){
+    private int set(int i,int j){
         JSONObject aStep = new JSONObject();
         aStep.put("x",i);
         aStep.put("y",j);
@@ -71,10 +104,17 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
             }
         }
         chessBoard[i][j] = nowPlayer;
-        nowPlayer = 3 - nowPlayer;
         return getVec(i,j);
     }
 
+    /**
+     * 判断刚刚落的子是否连成五颗
+     * @param x 刚刚落完的子所在的x坐标
+     * @param y 刚刚落完的子所在的y坐标
+     * @return 1 连成5个
+     *         0 未连成5个
+     *         -1 平局(整个棋盘都已经下满)
+     */
     private int getVec(int x,int y){
         int player = chessBoard[x][y];
         int next[][] = {
@@ -115,5 +155,4 @@ public class GameGoBang extends BaseGame<GameGoBangStep>{
     public JSONObject getRecord(){
         return record;
     }
-
 }

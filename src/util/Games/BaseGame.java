@@ -2,18 +2,27 @@ package util.Games;
 
 import net.sf.json.JSONObject;
 
+import java.util.List;
+
 /**
  * Created by syimlzhu on 2016/9/30.
  */
-public abstract class BaseGame<T extends BaseGameStep> {
+public abstract class BaseGame {
     /**
-     * @return
+     * 返回重现情况
+     * @return 重现情况的json对象
      */
     public abstract JSONObject getRecord();
 
     /**
-     * @param step
-     * @return
+     * 玩家列表
      */
-    public abstract int setStep(T step);
+    protected List<IGamePlayer> players;
+
+    /**
+     * 观战人列表
+     */
+    protected List<IGamePlayer> observers;
+
+    public abstract int run();
 }

@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by syimlzhu on 2016/9/30.
  */
-public abstract class BaseGame {
+public abstract class BaseGame implements Runnable {
     /**
      * 返回重现情况
      * @return 重现情况的json对象
@@ -24,5 +24,7 @@ public abstract class BaseGame {
      */
     protected List<IGamePlayer> observers;
 
-    public abstract int run();
+    public abstract void run();
+
+    public abstract int gameEnd(int status);
 }

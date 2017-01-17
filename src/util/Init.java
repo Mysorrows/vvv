@@ -1,6 +1,7 @@
 package util;
 
 import util.Event.EventMain;
+import util.Games.GameSocketServer;
 import util.JPush.Test;
 import util.TimerTasks.MyTimer;
 
@@ -17,6 +18,8 @@ public class Init extends HttpServlet {
             Main.Init();
             MyTimer.Init();
             EventMain.Init();
+
+            GameSocketServer.init();
             Tool.log("服务器启动完成");
         }catch (Exception e){
             Tool.log("服务器启动时出现异常");

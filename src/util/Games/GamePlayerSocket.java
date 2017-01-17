@@ -6,7 +6,7 @@ import java.net.Socket;
 /**
  * Created by syimlzhu on 2017/1/13.
  */
-public abstract class GamePlayerSocket implements IGamePlayer {
+public class GamePlayerSocket implements IGamePlayer {
 
     private Socket socket;
     GamePlayerSocket(Socket socket) {
@@ -20,18 +20,18 @@ public abstract class GamePlayerSocket implements IGamePlayer {
             if(len!=4){
                 throw new GameReadException();
             }
+            return (b[0]<<24) + (b[1]<<16)+ (b[2]<<8)+ b[3];
         } catch (IOException e) {
             throw new GameReadException();
         }
-        return 0;
     }
     public void putInt(int a) throws GameReadException{
         try {
             byte[] b = new byte[4];
             b[0] = (byte) (a >> 24);
-            b[0] = (byte) (a >> 16);
-            b[0] = (byte) (a >> 8);
-            b[0] = (byte) (a);
+            b[1] = (byte) (a >> 16);
+            b[2] = (byte) (a >> 8);
+            b[3] = (byte) (a);
             socket.getOutputStream().write(b);
         }catch (IOException e){
             throw new GameReadException();

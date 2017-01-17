@@ -5,6 +5,9 @@ import net.sf.json.JSONObject;
 import util.Games.BaseGame;
 import util.Games.GameReadException;
 import util.Games.IGamePlayer;
+import util.Tool;
+
+import java.util.ArrayList;
 
 /**
  * 1表示黑子，2表示白子
@@ -39,40 +42,56 @@ public class GameGoBang extends BaseGame{
         record.put("step",new JSONArray());
         stepNum = 0;
         nowPlayer = 1;
+        players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
     }
 
     @Override
-    public int run() {
+    public int gameEnd(int status){
+        Tool.debug("GameEnd("+status+")");
+        return status;
+    }
+
+    @Override
+    public void run() {
         try {
             players.get(0).putInt(1);
             players.get(1).putInt(2);
         }catch (GameReadException e) {
-            return -1;
+            gameEnd(-1);
+            return ;
         }
         while(true){
             int x,y,otherPlayer;
             try {
                 x = players.get(nowPlayer - 1).getInt();
                 y = players.get(nowPlayer - 1).getInt();
+
+                Tool.debug(nowPlayer+" ("+x+","+y+")");
                 otherPlayer = 3 - nowPlayer;
             }catch (GameReadException e){
-                return nowPlayer + 2;
+                gameEnd(nowPlayer + 2);
+                return ;
             }
             int ret = set(x, y);
             if(ret == 3 || ret == 4) {
                 //落子非法
-                return ret;
+                gameEnd(ret);
+                return ;
             }
 
             try {
                 players.get(otherPlayer -1).putInt(x);
                 players.get(otherPlayer -1).putInt(y);
             } catch (GameReadException e) {
-                return otherPlayer + 2;
+                gameEnd(otherPlayer + 2);
+                return ;
             }
-            if(ret != 0) return ret;
+            if(ret != 0){
+                gameEnd(ret);
+                return ;
+            }
             nowPlayer = 3 - nowPlayer;
         }
     }
